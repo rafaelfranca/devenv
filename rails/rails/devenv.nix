@@ -2,7 +2,7 @@
 {
   languages.ruby = {
     enable = true;
-    package = assert builtins.toString pkgs.ruby_4_0.version == "4.0.6"; pkgs.ruby_4_0;
+    version = "4.0.6";
     lsp.enable = false;
   };
 
