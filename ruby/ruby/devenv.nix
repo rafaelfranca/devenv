@@ -24,12 +24,8 @@
       set -euo pipefail
       unset BUNDLE_GEMFILE BUNDLE_PATH CONFIGURE_ARGS GEM_HOME GEM_PATH RUBYLIB RUBYOPT
       ./autogen.sh
-      mkdir -p build
-      (
-        cd build
-        ../configure -C --disable-install-doc
-        make -j"''${NIX_BUILD_CORES:-1}"
-      )
+      ./configure -C --disable-install-doc
+      make -j"''${NIX_BUILD_CORES:-1}"
     '';
   };
 
@@ -39,7 +35,7 @@
       set -euo pipefail
       unset BUNDLE_GEMFILE BUNDLE_PATH CONFIGURE_ARGS GEM_HOME GEM_PATH RUBYLIB RUBYOPT
       RUBY_TEST_TIMEOUT_SCALE=10 PRECHECK_BUNDLED_GEMS=no \
-        make -C build -j"''${NIX_BUILD_CORES:-1}" check
+        make -j"''${NIX_BUILD_CORES:-1}" check
     '';
   };
 }
