@@ -4,6 +4,8 @@
     autoconf
     automake
     cargo
+    cargo-insta
+    cargo-nextest
     git
     gmp
     gnumake
@@ -24,8 +26,8 @@
       set -euo pipefail
       unset BUNDLE_GEMFILE BUNDLE_PATH CONFIGURE_ARGS GEM_HOME GEM_PATH RUBYLIB RUBYOPT
       ./autogen.sh
-      ./configure -C --disable-install-doc
-      make -j"''${NIX_BUILD_CORES:-1}"
+      ./configure -C --disable-install-doc --enable-yjit=dev --enable-zjit=dev
+      make -j"''${NIX_BUILD_CORES:-$(getconf _NPROCESSORS_ONLN)}"
     '';
   };
 
@@ -34,8 +36,10 @@
     exec = ''
       set -euo pipefail
       unset BUNDLE_GEMFILE BUNDLE_PATH CONFIGURE_ARGS GEM_HOME GEM_PATH RUBYLIB RUBYOPT
+      make -j"''${NIX_BUILD_CORES:-$(getconf _NPROCESSORS_ONLN)}" yjit-check
+      make -j"''${NIX_BUILD_CORES:-$(getconf _NPROCESSORS_ONLN)}" zjit-check
       RUBY_TEST_TIMEOUT_SCALE=10 PRECHECK_BUNDLED_GEMS=no \
-        make -j"''${NIX_BUILD_CORES:-1}" check
+        make -j"''${NIX_BUILD_CORES:-$(getconf _NPROCESSORS_ONLN)}" check
     '';
   };
 }
