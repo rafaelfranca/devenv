@@ -18,6 +18,7 @@ in
     cargo-insta
     cargo-nextest
     git
+    chruby
     gmp
     gnumake
     gperf
