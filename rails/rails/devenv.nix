@@ -35,10 +35,11 @@
   services.mysql = {
     enable = true;
     package = pkgs.mysql84;
+    settings.mysqld.port = 3307;
   };
 
   env.MYSQL_HOST = "127.0.0.1";
-  env.MYSQL_PORT = config.env.MYSQL_TCP_PORT;
+  env.MYSQL_PORT = toString config.processes.mysql.ports.main.value;
 
   services.redis.enable = true;
   env.REDIS_URL = "redis://127.0.0.1:${toString config.processes.redis.ports.main.value}/0";
@@ -56,6 +57,8 @@
     ];
     exec = ''
       set -euo pipefail
+      pg_isready
+      mysqladmin --user=root ping
       bundle install
       yarn install
       bundle exec rake activerecord:db:rebuild
