@@ -30,8 +30,11 @@ in
     readline
     ruby
     rustc
+    rustPlatform.rustLibSrc
     zlib
   ];
+
+  env.RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
 
   tasks."ruby:build" = {
     exec = ''
