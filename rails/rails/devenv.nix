@@ -1,10 +1,21 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   languages.ruby = {
     enable = true;
     version = "4.0.6";
     lsp.enable = false;
   };
+
+  # Native gems must not be reused after the Ruby package changes.
+  env.BUNDLE_PATH = lib.mkForce (
+    "${config.env.DEVENV_STATE}/.bundle/"
+    + builtins.baseNameOf (toString config.languages.ruby.package)
+  );
+
+  # libxml-ruby does not read PKG_CONFIG_PATH.
+  env."BUNDLE_BUILD__LIBXML___RUBY" =
+    "--with-xml2-include=${pkgs.libxml2.dev}/include/libxml2"
+    + " --with-xml2-lib=${pkgs.libxml2.out}/lib";
 
   languages.javascript = {
     enable = true;
