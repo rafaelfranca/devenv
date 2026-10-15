@@ -81,3 +81,25 @@ Add a target configuration at `<org>/<repo>`:
 ```
 
 The target repository must have a `devenv.nix` file. The helper refuses paths that contain more than one slash, paths that start with `/`, and paths that end with `/`.
+
+## Fizzy
+
+The `basecamp/fizzy` configuration uses Ruby `3.4.8`, SQLite, libvips, ImageMagick, OpenSlide, FFmpeg, and MuPDF. It includes `libyaml` and `pkg-config` to build native gems.
+
+The setup task installs gems and prepares the database. Rails adds sample data when it creates the database. The task does not run the application's `mise` setup.
+
+1. Run these commands from the Fizzy directory:
+
+   ```zsh
+   devenv-allow
+   devenv tasks run fizzy:setup
+   devenv shell bin/dev
+   ```
+
+2. Open `http://app.fizzy.localhost:3006`.
+
+3. Log in with `david@example.com`. The development page shows the verification code.
+
+4. Stop the server with `Ctrl-C`.
+
+Fizzy uses SQLite for development Action Cable. It does not need Redis or a separate database server.
