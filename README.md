@@ -81,3 +81,27 @@ Add a target configuration at `<org>/<repo>`:
 ```
 
 The target repository must have a `devenv.nix` file. The helper refuses paths that contain more than one slash, paths that start with `/`, and paths that end with `/`.
+
+## Lobsters
+
+The `lobsters/lobsters` configuration uses Ruby `4.0.0` and libvips. It includes `libyaml` and `pkg-config` to build native gems.
+
+The setup task installs gems, copies `config/database.yml.sample` if `config/database.yml` does not exist, and prepares the databases. Rails adds seed data when it creates the databases.
+
+1. Run these commands from the Lobsters directory:
+
+   ```zsh
+   devenv-allow lobsters/lobsters
+   devenv tasks run lobsters:setup
+   devenv shell bin/dev
+   ```
+
+2. Open `http://localhost:3000`.
+
+3. Log in with username `test` and password `test`.
+
+4. Stop the server with `Ctrl-C`.
+
+Lobsters uses SQLite for its databases, cache, and job queue. It does not need Redis or a separate database server.
+
+The `sqlite3` gem builds SQLite with the options in `.bundle/config`. Use `devenv shell bin/sqlite3` instead of the system SQLite client.
