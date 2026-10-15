@@ -81,3 +81,14 @@ Add a target configuration at `<org>/<repo>`:
 ```
 
 The target repository must have a `devenv.nix` file. The helper refuses paths that contain more than one slash, paths that start with `/`, and paths that end with `/`.
+
+## Roundhouse
+
+The `rubys/roundhouse` configuration includes `libyaml` and `pkg-config`. Bundler uses them to build the native extension for `psych`.
+
+It also includes:
+
+- `libclang`, with `LIBCLANG_PATH` set. Bindgen needs it to build `ruby-rbs-sys` and `ruby-prism-sys`.
+- `vips`, with its library directory on `LD_LIBRARY_PATH`. The `ruby-vips` gem loads `libvips.so.42` at runtime.
+
+Run `devenv tasks run roundhouse:gems` to install the gems that Roundhouse's CI unit job installs for emitted-Ruby tests: `rails-html-sanitizer`, `sqlite3`, `bcrypt`, `rack`, `ruby-vips`, `markly`, and Active Record 8.1. The task does nothing once every one of them loads.
