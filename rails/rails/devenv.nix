@@ -54,6 +54,7 @@
 
   services.redis.enable = true;
   env.REDIS_URL = "redis://127.0.0.1:${toString config.processes.redis.ports.main.value}/0";
+  env.REDIS_URLS = "${config.env.REDIS_URL},redis://127.0.0.1:${toString config.processes.redis.ports.main.value}/1";
 
   services.memcached = {
     enable = true;
