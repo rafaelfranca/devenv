@@ -68,8 +68,11 @@ The helper then:
 4. Copies `devenv.yaml` temporarily when the central configuration provides one.
 5. Runs `devenv allow --from path:<configuration-path>`.
 6. Removes the temporary `devenv.yaml` after `devenv allow` finishes.
+7. Adds local Git exclude rules for `.devenv*` and `devenv.lock` if the directory is in a Git repository.
 
 The helper does not change an existing `devenv.yaml` in the target repository.
+
+The exclude rules apply to the local repository and its linked worktrees. They do not affect files that Git already tracks.
 
 ## Thor
 
