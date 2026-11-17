@@ -88,8 +88,80 @@ devenv-allow() {
   result=$?
 
   if [[ "$remove_input" == true ]]; then
-    rm -f "$input_file"
+    rm -f "$input_file" || {
+      print -u2 'devenv-allow: cannot remove the temporary input configuration'
+      return 1
+    }
   fi
 
-  return $result
+  (( result == 0 )) || return $result
+
+  local git_state
+  if ! git_state="$(LC_ALL=C git rev-parse --is-inside-work-tree 2>&1)"; then
+    if [[ -n "${1-}" && "$git_state" == 'fatal: not a git repository (or any of the parent directories): .git'* ]]; then
+      return 0
+    fi
+    print -u2 "devenv-allow: cannot inspect Git working tree: $git_state"
+    return 1
+  fi
+  if [[ "$git_state" != true ]]; then
+    print -u2 'devenv-allow: cannot add excludes outside a Git working tree'
+    return 1
+  fi
+
+  local prefix exclude
+  prefix="$(git rev-parse --show-prefix)" && exclude="$(git rev-parse --git-path info/exclude)" || {
+    print -u2 'devenv-allow: cannot locate the Git exclude file'
+    return 1
+  }
+  if [[ "$prefix" == *$'\n'* ]]; then
+    print -u2 'devenv-allow: cannot exclude a directory whose name contains a newline'
+    return 1
+  fi
+
+  # Anchor the patterns to this directory, escaping its literal Git wildcards.
+  local escaped_prefix='' char rule last output=''
+  local -i i
+  for (( i = 1; i <= ${#prefix}; i++ )); do
+    char="${prefix[i]}"
+    case "$char" in
+      ('\'|'*'|'?'|'[') escaped_prefix+="\\$char" ;;
+      (*) escaped_prefix+="$char" ;;
+    esac
+  done
+
+  local -a missing=()
+  for rule in "/${escaped_prefix}.devenv*" "/${escaped_prefix}devenv.lock"; do
+    if [[ -e "$exclude" ]]; then
+      if grep -Fqx -- "$rule" "$exclude"; then
+        continue
+      else
+        result=$?
+      fi
+      if (( result != 1 )); then
+        print -u2 "devenv-allow: cannot read Git exclude file: $exclude"
+        return 1
+      fi
+    fi
+    missing+=("$rule")
+  done
+
+  if (( ${#missing} )); then
+    if [[ -s "$exclude" ]]; then
+      last="$(tail -c 1 "$exclude")" || {
+        print -u2 "devenv-allow: cannot read Git exclude file: $exclude"
+        return 1
+      }
+      [[ -n "$last" ]] && output=$'\n'
+    fi
+    for rule in "${missing[@]}"; do
+      output+="${rule}"$'\n'
+    done
+    mkdir -p "${exclude:h}" && printf '%s' "$output" >> "$exclude" || {
+      print -u2 "devenv-allow: cannot update Git exclude file: $exclude"
+      return 1
+    }
+  fi
+
+  return 0
 }
