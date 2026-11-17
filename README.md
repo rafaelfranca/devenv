@@ -71,6 +71,19 @@ The helper then:
 
 The helper does not change an existing `devenv.yaml` in the target repository.
 
+## Thor
+
+The Thor environment uses Ruby 4.0.6 and stores installed gems in the devenv state directory.
+
+Run these commands in the Thor checkout after you install `devenv-allow`:
+
+```zsh
+devenv-allow
+devenv tasks run thor:setup
+devenv shell -- bundle exec thor spec
+devenv shell -- bundle exec rubocop
+```
+
 ## Repository layout
 
 Add a target configuration at `<org>/<repo>`:
