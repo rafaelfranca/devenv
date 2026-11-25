@@ -74,6 +74,17 @@ The helper does not change an existing `devenv.yaml` in the target repository.
 
 The exclude rules apply to the local repository and its linked worktrees. They do not affect files that Git already tracks.
 
+## GlobalID
+
+The GlobalID environment uses Ruby 4.0.6 and stores installed gems in the devenv state directory. Its setup task installs the locked dependencies without changing `Gemfile.lock`.
+
+Run these commands in the GlobalID checkout after you install `devenv-allow`:
+
+```zsh
+devenv-allow
+devenv tasks run globalid:setup
+```
+
 ## Thor
 
 The Thor environment uses Ruby 4.0.6 and stores installed gems in the devenv state directory.
